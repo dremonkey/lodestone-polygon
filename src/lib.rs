@@ -13,14 +13,14 @@ extern crate geojson;
 extern crate rustc_serialize;
 
 use rustc_serialize::json::{self, ToJson};
-use geojson::{Error, Feature, Geometry, Position, Value, FromObject};
+use geojson::{Error, Feature, Geometry, PolygonType, Value, FromObject};
 
 pub struct FeaturePolygon {
   feature: Feature
 }
 
 impl FeaturePolygon {
-  pub fn new(coordinates: Vec<Vec<Position>>) -> Self {
+  pub fn new(coordinates: PolygonType) -> Self {
 
     assert!(coordinates.len() >= 1);
 
@@ -43,7 +43,7 @@ impl FeaturePolygon {
     }
   }
 
-  pub fn coordinates(&self) -> &Vec<Vec<Position>> {
+  pub fn coordinates(&self) -> &PolygonType {
     type Err = Error;
     
     match self.feature.geometry.value {
