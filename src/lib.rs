@@ -15,6 +15,9 @@ extern crate rustc_serialize;
 use rustc_serialize::json::{self, ToJson};
 use geojson::{Error, Feature, Geometry, PolygonType, Value, FromObject};
 
+mod utils;
+
+#[derive(Debug, Clone)]
 pub struct FeaturePolygon {
   feature: Feature
 }
@@ -77,6 +80,27 @@ impl FromObject for FeaturePolygon {
     Ok(FeaturePolygon {
       feature: feature
     })
+  }
+}
+
+impl PartialEq for FeaturePolygon {
+  fn eq(&self, other: &Self) -> bool {
+    let rings1 = self.coordinates();
+    let rings2 = other.coordinates();
+    let mut is_equal = rings1.len() == rings2.len();
+    
+    if is_equal {
+      for (i, ring1) in rings1.iter().enumerate() {
+        let ring2 = rings2[i].clone();
+        
+        is_equal = utils::compare_rings(&ring1, &ring2);
+        if !is_equal {
+          break;
+        }
+      }
+    }
+
+    is_equal
   }
 }
 
