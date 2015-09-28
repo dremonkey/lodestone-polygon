@@ -15,6 +15,10 @@ extern crate rustc_serialize;
 use rustc_serialize::json::{self, ToJson};
 use geojson::{Error, Feature, Geometry, PolygonType, Value, FromObject};
 
+// Lodestone crates
+extern crate lodestone_bearing;
+extern crate lodestone_point;
+
 mod utils;
 
 #[derive(Debug, Clone)]
@@ -54,6 +58,14 @@ impl FeaturePolygon {
       _ => unreachable!("Type other than Value::Polygon should not be possible"),
     }
   }
+
+  ///// Check if the outer ring of the polygon is convex.
+  // pub fn is_convex(&self) -> bool {
+  //   for (let d of this.getInnerAngles()) {
+  //     if (d > 180) return false;
+  //   }
+  //   return true;
+  // }
 }
 
 impl FromStr for FeaturePolygon {
