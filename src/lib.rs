@@ -59,13 +59,10 @@ impl FeaturePolygon {
     }
   }
 
-  ///// Check if the outer ring of the polygon is convex.
-  // pub fn is_convex(&self) -> bool {
-  //   for (let d of this.getInnerAngles()) {
-  //     if (d > 180) return false;
-  //   }
-  //   return true;
-  // }
+  /// Check if the outer ring of the polygon is convex.
+  pub fn is_convex(&self) -> bool {
+    utils::is_convex(&self)
+  }
 }
 
 impl FromStr for FeaturePolygon {

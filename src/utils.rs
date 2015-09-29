@@ -3,8 +3,6 @@ use ::FeaturePolygon;
 use lodestone_bearing::bearing;
 use lodestone_point::FeaturePoint;
 
-// use lodestone_bearing::bearing;
-
 /// Utility method to check if the coordinates in the two rings are the same
 pub fn compare_rings(
     ring1: &Vec<Vec<f64>>, 
@@ -27,9 +25,12 @@ pub fn compare_rings(
   is_equal
 }
 
-// pub fn is_convex(
-
-//   )
+pub fn is_convex(poly: &FeaturePolygon) -> bool {
+  for d in inner_angles(&poly) {
+    if d > 180.0 { return false; }
+  }
+  true
+}
 
 fn inner_angles(poly: &FeaturePolygon) -> Vec<f64> {  
   
@@ -88,19 +89,7 @@ fn is_clockwise(ring: &Vec<Vec<f64>>) -> bool {
 #[cfg(test)]
 mod tests {
   use ::FeaturePolygon;
-  use super::{abs_angle, inner_angles, is_clockwise};
-
-  #[test]
-  fn test_inner_angles() {
-    let ring_cw = vec![vec![0.0, 0.0], vec![0.0, 1.0], vec![1.0, 1.0], vec![1.0, 0.0], vec![0.0, 0.0]];
-    let poly = FeaturePolygon::new(vec![ring_cw]);
-
-    for angle in inner_angles(&poly) {
-      // angles will be close but not exactly 90 because
-      // we are on a sphere
-      assert_eq!(angle - 90.0 < 1e-2, true);
-    }
-  }
+  use super::{abs_angle, inner_angles, is_clockwise, is_convex};
 
   #[test]
   fn test_abs_angle() {
@@ -116,11 +105,34 @@ mod tests {
   }
 
   #[test]
+  fn test_inner_angles() {
+    let ring_cw = vec![vec![0.0, 0.0], vec![0.0, 1.0], vec![1.0, 1.0], vec![1.0, 0.0], vec![0.0, 0.0]];
+    let poly = FeaturePolygon::new(vec![ring_cw]);
+
+    for angle in inner_angles(&poly) {
+      // angles will be close but not exactly 90 because
+      // we are on a sphere
+      assert_eq!(angle - 90.0 < 1e-2, true);
+    }
+  }
+
+  #[test]
   fn test_is_clockwise() {
     let ring_cw = vec![vec![0.0, 0.0], vec![0.0, 1.0], vec![1.0, 1.0], vec![1.0, 0.0], vec![0.0, 0.0]];
     let ring_ccw = vec![vec![0.0, 0.0], vec![1.0, 0.0], vec![1.0, 1.0], vec![0.0, 1.0], vec![0.0, 0.0]];
 
     assert_eq!(is_clockwise(&ring_cw), true);
     assert_eq!(is_clockwise(&ring_ccw), false);
+  }
+
+  #[test]
+  fn test_is_convex() {
+    let convex = vec![vec![0.0, 0.0], vec![0.0, 1.0], vec![1.0, 1.0], vec![1.0, 0.0], vec![0.0, 0.0]];
+    let concave = vec![vec![-1.0, -1.0], vec![3.0, 3.0], vec![2.0, 0.0], vec![5.0, -1.0], vec![-1.0, -1.0]];
+    let concave_poly = FeaturePolygon::new(vec![concave]);
+    let convex_poly = FeaturePolygon::new(vec![convex]);
+
+    assert_eq!(is_convex(&concave_poly), false);
+    assert_eq!(is_convex(&convex_poly), true);
   }
 }
